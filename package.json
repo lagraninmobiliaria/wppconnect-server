@@ -6,7 +6,7 @@
   "author": "kingaspx",
   "license": "Apache-2.0",
   "scripts": {
-    "start:prod": "npm run build && pm2 start dist/server.js --name api-backend",
+    "start:prod": "npm run build && pm2 start dist/server.js --name wppconnect",
     "build:types": "tsc",
     "build:js": "rimraf dist && babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline --copy-files",
     "build": "npm run build:types && npm run build:js",
