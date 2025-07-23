@@ -11,7 +11,7 @@ export default {
   maxListeners: 15,
   customUserDataDir: './userDataDir/',
   webhook: {
-    url: null,
+    url: 'https://communications-api.staging.mudafy.com/api/wpp-connect/webhook',
     autoDownload: true,
     uploadS3: false,
     readMessage: true,
