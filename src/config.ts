@@ -12,9 +12,9 @@ export default {
   customUserDataDir: './userDataDir/',
   webhook: {
     url: 'https://communications-api.staging.mudafy.com/api/wpp-connect/webhook',
-    autoDownload: true,
+    autoDownload: false,
     uploadS3: false,
-    readMessage: true,
+    readMessage: false,
     allUnreadOnStart: false,
     listenAcks: true,
     onPresenceChanged: true,
@@ -23,8 +23,8 @@ export default {
     onPollResponse: true,
     onRevokedMessage: true,
     onLabelUpdated: true,
-    onSelfMessage: false,
-    ignore: ['status@broadcast'],
+    onSelfMessage: true,
+    ignore: ['status@broadcast', 'onpresencechanged'],
   },
   websocket: {
     autoDownload: false,
