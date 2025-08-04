@@ -117,7 +117,7 @@ export function initServer(serverOptions: Partial<ServerOptions>): {
     });
   });
 
-  http.listen({ port: PORT, host: HOST }, () => {
+  http.listen({ port: PORT, host: '0.0.0.0' }, () => {
     logger.info(`Server is running on port: ${PORT}`);
     logger.info(
       `\x1b[31m Visit ${serverOptions.host}:${PORT}/api-docs for Swagger docs`

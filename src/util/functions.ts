@@ -238,13 +238,15 @@ export async function autoDownload(client: any, req: any, message: any) {
 }
 
 export async function startAllSessions(config: any, logger: any) {
+  console.log('starting all sessions');
   try {
     await api.post(
       `${config.host}:${config.port}/api/${config.secretKey}/start-all`
     );
   } catch (e) {
-    logger.error(e);
+    logger.error('error starting all sessions:', e);
   }
+  console.log('finish starting all sessions');
 }
 
 export async function startHelper(client: any, req: any) {

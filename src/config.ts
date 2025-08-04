@@ -2,7 +2,7 @@ import { ServerOptions } from './types/ServerOptions';
 
 export default {
   secretKey: 'THISISMYSECURETOKEN',
-  host: '0.0.0.0',
+  host: 'http://localhost',
   port: '21465',
   deviceName: 'Mudafy',
   poweredBy: 'Mudafy',
