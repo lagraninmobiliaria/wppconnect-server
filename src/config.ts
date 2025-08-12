@@ -1,7 +1,7 @@
 import { ServerOptions } from './types/ServerOptions';
 
 export default {
-  secretKey: 'THISISMYSECURETOKEN',
+  secretKey: 'wjDblwXhxfjX9mO--T9u0hRkOBj8_7c-eXQFtL7av2I',
   host: 'http://localhost',
   port: '21465',
   deviceName: 'Mudafy',
@@ -11,7 +11,7 @@ export default {
   maxListeners: 15,
   customUserDataDir: './userDataDir/',
   webhook: {
-    url: 'https://communications-api.staging.mudafy.com/api/wpp-connect/webhook',
+    url: 'https://core-communications-api.staging.mudafy.com/api/v1/communications/wapi/webhook',
     autoDownload: false,
     uploadS3: false,
     readMessage: false,
