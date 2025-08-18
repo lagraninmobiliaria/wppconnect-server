@@ -27,6 +27,50 @@ Connect with us across various platforms to stay updated and engage in discussio
 [![WhatsApp Group](https://img.shields.io/badge/WhatsApp-Group-25D366?logo=whatsapp)](https://chat.whatsapp.com/LJaQu6ZyNvnBPNAVRbX00K)
 [![YouTube](https://img.shields.io/youtube/channel/subscribers/UCD7J9LG08PmGQrF5IS7Yv9A?label=YouTube)](https://www.youtube.com/c/wppconnect)
 
+## Mudafy VM execution
+
+### Installation
+```bash
+# Instalar Git
+sudo apt update
+sudo apt install git -y
+git --version
+
+# Instalar node
+sudo apt install curl -y
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Instalar pm2
+sudo npm install -g pm2
+
+# Instalar chromium
+sudo apt-get update
+sudo apt-get install -y \
+    libnss3 \
+    libnspr4 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libasound2
+```
+
+### Execution
+```bash
+npm run start:prod
+pm2 save
+pm2 startup
+```
+
 ## Documentations
 
 Detailed documentation and guides are available for your convenience:
