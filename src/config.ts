@@ -11,7 +11,7 @@ export default {
   maxListeners: 15,
   customUserDataDir: './userDataDir/',
   webhook: {
-    url: 'https://core-communications-api.staging.mudafy.com/api/v1/communications/wapi/webhook',
+    url: 'https://core-communications-api.mudafy.com/api/v1/communications/wapi/webhook',
     autoDownload: false,
     uploadS3: false,
     readMessage: false,
