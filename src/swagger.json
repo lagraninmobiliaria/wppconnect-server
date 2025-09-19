@@ -2059,11 +2059,6 @@
                           "nullable": true,
                           "example": "2222222222222@c.us"
                         },
-                        "pictureUrl": {
-                          "type": "string",
-                          "nullable": true,
-                          "example": "https://..."
-                        },
                         "createdAt": {
                           "type": "string",
                           "nullable": true,
@@ -2371,11 +2366,6 @@
                           "type": "string",
                           "nullable": true,
                           "example": "2222222222222@c.us"
-                        },
-                        "pictureUrl": {
-                          "type": "string",
-                          "nullable": true,
-                          "example": "https://..."
                         },
                         "createdAt": {
                           "type": "string",
