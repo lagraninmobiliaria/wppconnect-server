@@ -1066,6 +1066,60 @@ export async function getGroupInfo(req: Request, res: Response) {
      #swagger.parameters["groupId"] = {
       schema: '<groupId>'
      }
+     #swagger.summary = 'Get detailed information about a group'
+     #swagger.responses[200] = {
+       description: 'Group information retrieved successfully',
+       content: {
+         "application/json": {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'success' },
+               response: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string', example: '1234567890@g.us' },
+                   name: { type: 'string', example: 'Nombre del grupo' },
+                   description: { type: 'string', nullable: true, example: 'Descripción del grupo' },
+                   subject: { type: 'string', example: 'Asunto del grupo' },
+                   subjectUpdatedAt: { type: 'string', nullable: true, example: '2024-11-12T08:00:00.000Z' },
+                   subjectUpdatedBy: { type: 'string', nullable: true, example: '1111111111111@c.us' },
+                   descriptionUpdatedAt: { type: 'string', nullable: true, example: '2024-11-13T09:00:00.000Z' },
+                   descriptionUpdatedBy: { type: 'string', nullable: true, example: '2222222222222@c.us' },
+                   pictureUrl: { type: 'string', nullable: true, example: 'https://...' },
+                   createdAt: { type: 'string', nullable: true, example: '2024-11-10T12:34:56.000Z' },
+                   lastActivityAt: { type: 'string', nullable: true, example: '2024-11-15T10:00:00.000Z' },
+                   participants: {
+                     type: 'array',
+                     items: {
+                       type: 'object',
+                       properties: {
+                         id: { type: 'string', example: '1111111111111@c.us' },
+                         isAdmin: { type: 'boolean', example: true }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[500] = {
+       description: 'Internal error retrieving group info',
+       content: {
+         "application/json": {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'error' },
+               message: { type: 'string', example: 'Error on get group info' }
+             }
+           }
+         }
+       }
+     }
    */
   const { groupId } = req.params;
 
