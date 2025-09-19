@@ -1052,3 +1052,51 @@ export async function getCommonGroups(req: Request, res: Response) {
     });
   }
 }
+
+export async function getGroupInfo(req: Request, res: Response) {
+  /**
+     #swagger.tags = ["Group"]
+     #swagger.autoBody=false
+     #swagger.security = [{
+            "bearerAuth": []
+     }]
+     #swagger.parameters["session"] = {
+      schema: 'NERDWHATS_AMERICA'
+     }
+     #swagger.parameters["groupId"] = {
+      schema: '<groupId>'
+     }
+   */
+  const { groupId } = req.params;
+
+  try {
+    let response: any = {};
+    for (const group of groupToArray(groupId)) {
+      const chat: any = await req.client.getChatById(group);
+      const participants =
+        chat?.groupMetadata?.participants?.map((p: any) => ({
+          id: p?.id?._serialized || p?.id || '',
+          isAdmin:
+            Boolean(p?.isAdmin) ||
+            Boolean(p?.isSuperAdmin) ||
+            Boolean(p?.admin),
+        })) || [];
+
+      response = {
+        id: chat?.id?._serialized || chat?.id?.user || group,
+        name: chat?.name || chat?.formattedTitle || '',
+        description: chat?.groupMetadata?.desc || chat?.description || null,
+        participants,
+      };
+    }
+
+    res.status(200).json({ status: 'success', response: response });
+  } catch (e) {
+    req.logger.error(e);
+    res.status(500).json({
+      status: 'error',
+      message: 'Error on get group info',
+      error: e,
+    });
+  }
+}
