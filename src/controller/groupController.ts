@@ -237,11 +237,29 @@ export async function getGroupMembers(req: Request, res: Response) {
      }
    */
   const { groupId } = req.params;
+  const { forcePhoneName } = req.query as { [key: string]: any };
 
   try {
     let response = {};
     for (const group of groupToArray(groupId)) {
-      response = await req.client.getGroupMembers(group);
+      const members: any[] = await req.client.getGroupMembers(group);
+      const enhancedMembers = (members || []).map((c: any) => {
+        const rawId = (c?.id && c.id._serialized) || c?.id || '';
+        const idStr = String(rawId);
+        const userPart = idStr.includes('@') ? idStr.split('@')[0] : idStr;
+        const phone = (userPart || '').replace(/\D/g, '');
+        const cUsJid = phone ? `${phone}@c.us` : null;
+
+        return Object.assign({}, c, {
+          phone,
+          cUsJid,
+          formattedName:
+            forcePhoneName === 'true' || forcePhoneName === true
+              ? phone || c?.formattedName
+              : c?.formattedName,
+        });
+      });
+      response = enhancedMembers;
     }
     res.status(200).json({ status: 'success', response: response });
   } catch (e) {
