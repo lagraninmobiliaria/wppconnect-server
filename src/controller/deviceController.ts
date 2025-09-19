@@ -1878,14 +1878,61 @@ export async function getContact(req: Request, res: Response) {
       schema: '5521999999999'
      }
    */
-  const { phone = true } = req.params;
+  const { phone = '' } = req.params;
+  const { forcePhoneName, resolvePhones } = req.query as { [key: string]: any };
   try {
-    let response;
-    for (const contato of contactToArray(phone as string, false)) {
-      response = await req.client.getContact(contato);
+    // Normalize input: accept raw number or any JID variant
+    const idParam: string = String(phone);
+    const normalizedId = idParam.includes('@')
+      ? idParam
+      : `${String(idParam).replace(/\D/g, '')}@c.us`;
+
+    const contact: any = await req.client.getContact(normalizedId);
+
+    async function resolveToCUsJid(raw: any): Promise<string | null> {
+      const idStr = String((raw && raw._serialized) || raw || '');
+      if (!idStr) return null;
+      if (idStr.endsWith('@c.us')) return idStr;
+      // Try to resolve via chat/contact lookups
+      try {
+        const chat = await req.client.getChatById(idStr);
+        const chatId = (chat?.id && (chat.id as any)._serialized) || null;
+        if (typeof chatId === 'string' && chatId.endsWith('@c.us')) return chatId;
+      } catch (e) {}
+      try {
+        const c = await req.client.getContact(idStr);
+        const cId =
+          ((c as any)?.id && (c as any).id._serialized) ||
+          (typeof (c as any)?.id === 'string' ? (c as any).id : null);
+        if (typeof cId === 'string' && cId.endsWith('@c.us')) return cId;
+      } catch (e) {}
+      return null;
     }
 
-    res.status(200).json({ status: 'success', response: response });
+    const rawId =
+      ((contact?.id as any)?._serialized as string) ||
+      (typeof contact?.id === 'string' ? (contact.id as string) : normalizedId);
+
+    let cUsJid: string | null = null;
+    if (resolvePhones === 'false' || resolvePhones === false) {
+      cUsJid = rawId.endsWith('@c.us') ? rawId : null;
+    } else {
+      cUsJid = await resolveToCUsJid(rawId);
+    }
+
+    const phoneNum = cUsJid ? cUsJid.split('@')[0] : null;
+
+    const enriched = Object.assign({}, contact, {
+      rawId,
+      cUsJid,
+      phone: phoneNum,
+      formattedName:
+        (forcePhoneName === 'true' || forcePhoneName === true) && phoneNum
+          ? phoneNum
+          : (contact as any)?.formattedName,
+    });
+
+    res.status(200).json({ status: 'success', response: enriched });
   } catch (error) {
     req.logger.error(error);
     res

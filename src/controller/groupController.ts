@@ -237,28 +237,61 @@ export async function getGroupMembers(req: Request, res: Response) {
      }
    */
   const { groupId } = req.params;
-  const { forcePhoneName } = req.query as { [key: string]: any };
+  const { forcePhoneName, resolvePhones } = req.query as { [key: string]: any };
 
   try {
     let response = {};
     for (const group of groupToArray(groupId)) {
       const members: any[] = await req.client.getGroupMembers(group);
-      const enhancedMembers = (members || []).map((c: any) => {
-        const rawId = (c?.id && c.id._serialized) || c?.id || '';
-        const idStr = String(rawId);
-        const userPart = idStr.includes('@') ? idStr.split('@')[0] : idStr;
-        const phone = (userPart || '').replace(/\D/g, '');
-        const cUsJid = phone ? `${phone}@c.us` : null;
 
-        return Object.assign({}, c, {
-          phone,
-          cUsJid,
-          formattedName:
-            forcePhoneName === 'true' || forcePhoneName === true
-              ? phone || c?.formattedName
-              : c?.formattedName,
-        });
-      });
+      async function resolveToCUsJid(raw: any): Promise<string | null> {
+        const idStr = String((raw && raw._serialized) || raw || '');
+        if (!idStr) return null;
+        if (idStr.endsWith('@c.us')) return idStr;
+        // Try to resolve via chat/contact lookups
+        try {
+          const chat = await req.client.getChatById(idStr);
+          const chatId = (chat?.id && (chat.id as any)._serialized) || null;
+          if (typeof chatId === 'string' && chatId.endsWith('@c.us')) return chatId;
+        } catch (e) {}
+        try {
+          const contact = await req.client.getContact(idStr);
+          const contactId =
+            ((contact as any)?.id && (contact as any).id._serialized) ||
+            (typeof (contact as any)?.id === 'string' ? (contact as any).id : null);
+          if (typeof contactId === 'string' && contactId.endsWith('@c.us')) return contactId;
+        } catch (e) {}
+        // No safe conversion
+        return null;
+      }
+
+      const enhancedMembers = await Promise.all(
+        (members || []).map(async (c: any) => {
+          const rawId = (c?.id && (c.id as any)._serialized) || c?.id || '';
+          const idStr = String(rawId);
+
+          let cUsJid: string | null = null;
+          if (resolvePhones === 'false' || resolvePhones === false) {
+            // fast path: only trust already c.us ids
+            cUsJid = idStr.endsWith('@c.us') ? idStr : null;
+          } else {
+            cUsJid = await resolveToCUsJid(rawId);
+          }
+
+          const phone = cUsJid ? cUsJid.split('@')[0] : null;
+
+          return Object.assign({}, c, {
+            rawId: idStr,
+            phone,
+            cUsJid,
+            formattedName:
+              (forcePhoneName === 'true' || forcePhoneName === true) && phone
+                ? phone
+                : c?.formattedName,
+          });
+        })
+      );
+
       response = enhancedMembers;
     }
     res.status(200).json({ status: 'success', response: response });
