@@ -1184,7 +1184,8 @@ export async function getGroupInfo(req: Request, res: Response) {
       let pictureUrl: any = null;
       try {
         const pic = await req.client.getProfilePicFromServer(group);
-        pictureUrl = typeof pic === 'string' ? pic : pic?.imgUrl || pic?.eurl || null;
+        if (typeof pic === 'string') pictureUrl = pic;
+        else pictureUrl = pic?.eurl || pic?.imgFull || pic?.img || null;
       } catch (err) {
         pictureUrl = null;
       }
