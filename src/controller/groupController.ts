@@ -1073,6 +1073,50 @@ export async function getGroupInfo(req: Request, res: Response) {
     let response: any = {};
     for (const group of groupToArray(groupId)) {
       const chat: any = await req.client.getChatById(group);
+
+      // Basic fields
+      const id = chat?.id?._serialized || chat?.id?.user || group;
+      const name = chat?.name || chat?.formattedTitle || '';
+      const description = chat?.groupMetadata?.desc || chat?.description || null;
+
+      // Subject and updates
+      const subject = chat?.groupMetadata?.subject || name;
+      const subjectUpdatedAtRaw =
+        chat?.groupMetadata?.subjectTime || chat?.groupMetadata?.subjectUpdatedAt;
+      const subjectUpdatedAt = subjectUpdatedAtRaw
+        ? new Date((subjectUpdatedAtRaw as number) * 1000).toISOString()
+        : null;
+      const subjectUpdatedBy =
+        chat?.groupMetadata?.subjectOwner?._serialized ||
+        chat?.groupMetadata?.subjectOwner ||
+        chat?.groupMetadata?.subjectUpdatedBy ||
+        null;
+
+      // Description updates
+      const descriptionUpdatedAtRaw =
+        chat?.groupMetadata?.descTime || chat?.groupMetadata?.descriptionTime;
+      const descriptionUpdatedAt = descriptionUpdatedAtRaw
+        ? new Date((descriptionUpdatedAtRaw as number) * 1000).toISOString()
+        : null;
+      const descriptionUpdatedBy =
+        chat?.groupMetadata?.descOwner?._serialized ||
+        chat?.groupMetadata?.descOwner ||
+        chat?.groupMetadata?.descriptionUpdatedBy ||
+        null;
+
+      // Created at
+      const createdAtRaw = chat?.groupMetadata?.creation;
+      const createdAt = createdAtRaw
+        ? new Date((createdAtRaw as number) * 1000).toISOString()
+        : null;
+
+      // Last activity
+      const lastActivityAtRaw = chat?.t || chat?.lastActivity;
+      const lastActivityAt = lastActivityAtRaw
+        ? new Date((lastActivityAtRaw as number) * 1000).toISOString()
+        : null;
+
+      // Participants
       const participants =
         chat?.groupMetadata?.participants?.map((p: any) => ({
           id: p?.id?._serialized || p?.id || '',
@@ -1082,10 +1126,27 @@ export async function getGroupInfo(req: Request, res: Response) {
             Boolean(p?.admin),
         })) || [];
 
+      // Picture URL
+      let pictureUrl: any = null;
+      try {
+        const pic = await req.client.getProfilePicFromServer(group);
+        pictureUrl = typeof pic === 'string' ? pic : pic?.imgUrl || pic?.eurl || null;
+      } catch (err) {
+        pictureUrl = null;
+      }
+
       response = {
-        id: chat?.id?._serialized || chat?.id?.user || group,
-        name: chat?.name || chat?.formattedTitle || '',
-        description: chat?.groupMetadata?.desc || chat?.description || null,
+        id,
+        name,
+        description,
+        subject,
+        subjectUpdatedAt,
+        subjectUpdatedBy,
+        descriptionUpdatedAt,
+        descriptionUpdatedBy,
+        pictureUrl,
+        createdAt,
+        lastActivityAt,
         participants,
       };
     }
