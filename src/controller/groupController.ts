@@ -1086,7 +1086,6 @@ export async function getGroupInfo(req: Request, res: Response) {
                    subjectUpdatedBy: { type: 'string', nullable: true, example: '1111111111111@c.us' },
                    descriptionUpdatedAt: { type: 'string', nullable: true, example: '2024-11-13T09:00:00.000Z' },
                    descriptionUpdatedBy: { type: 'string', nullable: true, example: '2222222222222@c.us' },
-                   pictureUrl: { type: 'string', nullable: true, example: 'https://...' },
                    createdAt: { type: 'string', nullable: true, example: '2024-11-10T12:34:56.000Z' },
                    lastActivityAt: { type: 'string', nullable: true, example: '2024-11-15T10:00:00.000Z' },
                    participants: {
@@ -1180,16 +1179,6 @@ export async function getGroupInfo(req: Request, res: Response) {
             Boolean(p?.admin),
         })) || [];
 
-      // Picture URL
-      let pictureUrl: any = null;
-      try {
-        const pic = await req.client.getProfilePicFromServer(group);
-        if (typeof pic === 'string') pictureUrl = pic;
-        else pictureUrl = pic?.imgFull || pic?.img || pic?.raw || pic?.eurl || null;
-      } catch (err) {
-        pictureUrl = null;
-      }
-
       response = {
         id,
         name,
@@ -1199,7 +1188,6 @@ export async function getGroupInfo(req: Request, res: Response) {
         subjectUpdatedBy,
         descriptionUpdatedAt,
         descriptionUpdatedBy,
-        pictureUrl,
         createdAt,
         lastActivityAt,
         participants,
